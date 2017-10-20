@@ -1,6 +1,6 @@
 /**************************************************************************/
 /*!
-    @file     gshauSQM_TSL2591.h
+    @file     SQM_TSL2591.h
     @author   gshau
 
     Forked from original Adafruit TSL2591 libraries
@@ -129,10 +129,10 @@ typedef struct  {
 } sensorConfig;
 
 
-class gshauSQM_TSL2591 : public Adafruit_Sensor
+class SQM_TSL2591 : public Adafruit_Sensor
 {
  public:
-  gshauSQM_TSL2591(int32_t sensorID = -1);
+  SQM_TSL2591(int32_t sensorID = -1);
 
   boolean   begin   ( void );
   void      enable  ( void );

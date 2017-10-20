@@ -1,6 +1,6 @@
 /**************************************************************************/
 /*!
-    @file     gshauSQM_TSL2591.h
+    @file     SQM_TSL2591.h
     @author   gshau
 
     Forked from original Adafruit TSL2591 libraries
@@ -59,9 +59,9 @@
 #endif
 #include <stdlib.h>
 
-#include "gshauSQM_TSL2591.h"
+#include "SQM_TSL2591.h"
 
-gshauSQM_TSL2591::gshauSQM_TSL2591(int32_t sensorID)
+SQM_TSL2591::SQM_TSL2591(int32_t sensorID)
 {
   _initialized       = false;
   _integration       = TSL2591_INTEGRATIONTIME_400MS;
@@ -72,7 +72,7 @@ gshauSQM_TSL2591::gshauSQM_TSL2591(int32_t sensorID)
   // we cant do wire initialization till later, because we havent loaded Wire yet
 }
 
-boolean gshauSQM_TSL2591::begin(void)
+boolean SQM_TSL2591::begin(void)
 {
   Wire.begin();
 
@@ -95,7 +95,7 @@ boolean gshauSQM_TSL2591::begin(void)
   return _initialized;
 }
 
-void gshauSQM_TSL2591::enable(void)
+void SQM_TSL2591::enable(void)
 {
   if (!_initialized)
   {
@@ -109,7 +109,7 @@ void gshauSQM_TSL2591::enable(void)
   write8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_ENABLE, TSL2591_ENABLE_POWERON | TSL2591_ENABLE_AEN | TSL2591_ENABLE_AIEN);
 }
 
-void gshauSQM_TSL2591::disable(void)
+void SQM_TSL2591::disable(void)
 {
   if (!_initialized)
   {
@@ -123,7 +123,7 @@ void gshauSQM_TSL2591::disable(void)
   write8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_ENABLE, TSL2591_ENABLE_POWEROFF);
 }
 
-void gshauSQM_TSL2591::setGain(tsl2591Gain_t gain)
+void SQM_TSL2591::setGain(tsl2591Gain_t gain)
 {
   if (!_initialized)
   {
@@ -160,16 +160,16 @@ void gshauSQM_TSL2591::setGain(tsl2591Gain_t gain)
 
 }
 
-void gshauSQM_TSL2591::setCalibrationOffset(float calibrationOffset){
+void SQM_TSL2591::setCalibrationOffset(float calibrationOffset){
   _calibrationOffset = calibrationOffset;
 }
 
-tsl2591Gain_t gshauSQM_TSL2591::getGain()
+tsl2591Gain_t SQM_TSL2591::getGain()
 {
   return _gain;
 }
 
-void gshauSQM_TSL2591::setTiming(tsl2591IntegrationTime_t integration)
+void SQM_TSL2591::setTiming(tsl2591IntegrationTime_t integration)
 {
   if (!_initialized)
   {
@@ -215,18 +215,18 @@ void gshauSQM_TSL2591::setTiming(tsl2591IntegrationTime_t integration)
 
 }
 
-tsl2591IntegrationTime_t gshauSQM_TSL2591::getTiming()
+tsl2591IntegrationTime_t SQM_TSL2591::getTiming()
 {
   return _integration;
 }
 
-void gshauSQM_TSL2591::configSensor()
+void SQM_TSL2591::configSensor()
 {
   setGain(config.gain);
   setTiming(config.time);
 }
 
-void gshauSQM_TSL2591::showConfig(){
+void SQM_TSL2591::showConfig(){
   Serial.print("Integration: "); Serial.print(integrationValue); Serial.println(" ms");
   Serial.print("Gain:        "); Serial.print(gainValue); Serial.println("x");
 
@@ -234,7 +234,7 @@ void gshauSQM_TSL2591::showConfig(){
 
 
 
-uint32_t gshauSQM_TSL2591::getFullLuminosity (void)
+uint32_t SQM_TSL2591::getFullLuminosity (void)
 {
   if (!_initialized)
   {
@@ -263,7 +263,7 @@ uint32_t gshauSQM_TSL2591::getFullLuminosity (void)
   return x;
 }
 
-void gshauSQM_TSL2591::bumpGain(int bumpDirection){
+void SQM_TSL2591::bumpGain(int bumpDirection){
   switch (config.gain)
   {
     case TSL2591_GAIN_LOW :
@@ -301,7 +301,7 @@ void gshauSQM_TSL2591::bumpGain(int bumpDirection){
 }
 
 
-void gshauSQM_TSL2591::bumpTime(int bumpDirection){
+void SQM_TSL2591::bumpTime(int bumpDirection){
   switch (config.time)
   {
     case TSL2591_INTEGRATIONTIME_200MS :
@@ -333,7 +333,7 @@ void gshauSQM_TSL2591::bumpTime(int bumpDirection){
 }
 
 
-void gshauSQM_TSL2591::takeReading (void){
+void SQM_TSL2591::takeReading (void){
   uint32_t lum;
   niter=1;
   configSensor();
@@ -425,7 +425,7 @@ void gshauSQM_TSL2591::takeReading (void){
 }
 
 
-uint8_t gshauSQM_TSL2591::read8(uint8_t reg)
+uint8_t SQM_TSL2591::read8(uint8_t reg)
 {
   Wire.beginTransmission(TSL2591_ADDR);
   Wire.write(0x80 | 0x20 | reg); // command bit, normal mode
@@ -436,7 +436,7 @@ uint8_t gshauSQM_TSL2591::read8(uint8_t reg)
   return Wire.read();
 }
 
-uint16_t gshauSQM_TSL2591::read16(uint8_t reg)
+uint16_t SQM_TSL2591::read16(uint8_t reg)
 {
   uint16_t x;
   uint16_t t;
@@ -462,7 +462,7 @@ uint16_t gshauSQM_TSL2591::read16(uint8_t reg)
   return x;
 }
 
-void gshauSQM_TSL2591::write8 (uint8_t reg, uint8_t value)
+void SQM_TSL2591::write8 (uint8_t reg, uint8_t value)
 {
   Wire.beginTransmission(TSL2591_ADDR);
 #if ARDUINO >= 100
@@ -477,7 +477,7 @@ void gshauSQM_TSL2591::write8 (uint8_t reg, uint8_t value)
 
 
 
-float gshauSQM_TSL2591::calculateLux(uint16_t ch0, uint16_t ch1) /*wbp*/
+float SQM_TSL2591::calculateLux(uint16_t ch0, uint16_t ch1) /*wbp*/
 {
   float atime, again; /*wbp*/
   float    cpl, lux1, lux2, lux;
@@ -559,7 +559,7 @@ float gshauSQM_TSL2591::calculateLux(uint16_t ch0, uint16_t ch1) /*wbp*/
     @brief  Gets the most recent sensor event
 */
 /**************************************************************************/
-void gshauSQM_TSL2591::getEvent(sensors_event_t *event)
+void SQM_TSL2591::getEvent(sensors_event_t *event)
 {
   uint16_t ir, full;
   uint32_t lum = getFullLuminosity();
@@ -587,7 +587,7 @@ void gshauSQM_TSL2591::getEvent(sensors_event_t *event)
     @brief  Gets the sensor_t data
 */
 /**************************************************************************/
-void gshauSQM_TSL2591::getSensor(sensor_t *sensor)
+void SQM_TSL2591::getSensor(sensor_t *sensor)
 {
   /* Clear the sensor_t object */
   memset(sensor, 0, sizeof(sensor_t));

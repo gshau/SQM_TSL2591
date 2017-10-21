@@ -1,0 +1,3 @@
+[submodule "wxserver"]
+	path = wxserver
+	url = https://github.com/gshau/wxserver

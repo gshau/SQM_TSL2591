@@ -559,7 +559,7 @@ float SQM_TSL2591::calculateLux(uint16_t ch0, uint16_t ch1) /*wbp*/
     @brief  Gets the most recent sensor event
 */
 /**************************************************************************/
-void SQM_TSL2591::getEvent(sensors_event_t *event)
+bool SQM_TSL2591::getEvent(sensors_event_t *event)
 {
   uint16_t ir, full;
   uint32_t lum = getFullLuminosity();
@@ -580,6 +580,7 @@ void SQM_TSL2591::getEvent(sensors_event_t *event)
   /* Calculate the actual lux value */
   /* 0 = sensor overflow (too much light) */
   event->light = calculateLux(full, ir);
+  return true;
 }
 
 /**************************************************************************/

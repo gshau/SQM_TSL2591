@@ -163,8 +163,8 @@ class SQM_TSL2591 : public Adafruit_Sensor
   void bumpTime(int bumpDirection);
 
   /* Unified Sensor API Functions */
-  void getEvent  ( sensors_event_t* );
-  void getSensor ( sensor_t* );
+    bool getEvent  ( sensors_event_t* );
+    void getSensor ( sensor_t* );
 
  private:
   tsl2591IntegrationTime_t _integration;

@@ -158,6 +158,7 @@ class SQM_TSL2591 : public Adafruit_Sensor
   sensorConfig config;
   float integrationValue, gainValue;
   double mpsas, dmpsas;
+  bool verbose;
 
   void bumpGain(int bumpDirection);
   void bumpTime(int bumpDirection);

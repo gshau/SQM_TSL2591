@@ -5,7 +5,7 @@
 
     Forked from original Adafruit TSL2591 libraries
     @author   KT0WN (adafruit.com)
-		@author   wbphelps (wm@usa.net)
+                @author   wbphelps (wm@usa.net)
 
     This is a library for the Adafruit TSL2591 breakout board
     This library works with the Adafruit TSL2591 breakout
@@ -44,14 +44,14 @@
     (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
     LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
     ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /**************************************************************************/
 #ifdef ESP8266
-    #include <pgmspace.h>
+#include <pgmspace.h>
 #else
-    #include <avr/pgmspace.h>
+#include <avr/pgmspace.h>
 #endif
 
 #if defined(__AVR__)
@@ -61,24 +61,22 @@
 
 #include "SQM_TSL2591.h"
 
-SQM_TSL2591::SQM_TSL2591(int32_t sensorID)
-{
-  _initialized       = false;
-  _integration       = TSL2591_INTEGRATIONTIME_400MS;
-  _gain              = TSL2591_GAIN_LOW;
-  _sensorID          = sensorID;
+SQM_TSL2591::SQM_TSL2591(int32_t sensorID) {
+  _initialized = false;
+  _integration = TSL2591_INTEGRATIONTIME_400MS;
+  _gain = TSL2591_GAIN_LOW;
+  _sensorID = sensorID;
   _calibrationOffset = 0.;
 
-  // we cant do wire initialization till later, because we havent loaded Wire yet
+  // we cant do wire initialization till later, because we havent loaded Wire
+  // yet
 }
 
-boolean SQM_TSL2591::begin(void)
-{
+boolean SQM_TSL2591::begin(void) {
   Wire.begin();
 
   uint8_t id = read8(0x12);
-  if (id != 0x50 )
-  {
+  if (id != 0x50) {
     return false;
   }
 
@@ -92,43 +90,38 @@ boolean SQM_TSL2591::begin(void)
   // Note: by default, the device is in power down mode on bootup
   disable();
 
+  verbose = true;
+
   return _initialized;
 }
 
-void SQM_TSL2591::enable(void)
-{
-  if (!_initialized)
-  {
-    if (!begin())
-    {
+void SQM_TSL2591::enable(void) {
+  if (!_initialized) {
+    if (!begin()) {
       return;
     }
   }
 
   // Enable the device by setting the control bit to 0x01
-  write8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_ENABLE, TSL2591_ENABLE_POWERON | TSL2591_ENABLE_AEN | TSL2591_ENABLE_AIEN);
+  write8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_ENABLE,
+         TSL2591_ENABLE_POWERON | TSL2591_ENABLE_AEN | TSL2591_ENABLE_AIEN);
 }
 
-void SQM_TSL2591::disable(void)
-{
-  if (!_initialized)
-  {
-    if (!begin())
-    {
+void SQM_TSL2591::disable(void) {
+  if (!_initialized) {
+    if (!begin()) {
       return;
     }
   }
 
   // Disable the device by setting the control bit to 0x00
-  write8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_ENABLE, TSL2591_ENABLE_POWEROFF);
+  write8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_ENABLE,
+         TSL2591_ENABLE_POWEROFF);
 }
 
-void SQM_TSL2591::setGain(tsl2591Gain_t gain)
-{
-  if (!_initialized)
-  {
-    if (!begin())
-    {
+void SQM_TSL2591::setGain(tsl2591Gain_t gain) {
+  if (!_initialized) {
+    if (!begin()) {
       return;
     }
   }
@@ -138,43 +131,36 @@ void SQM_TSL2591::setGain(tsl2591Gain_t gain)
   write8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_CONTROL, _integration | _gain);
   disable();
 
-  switch (_gain)
-  {
-    case TSL2591_GAIN_LOW :
-      gainValue = 1.0F;
-      break;
-    case TSL2591_GAIN_MED :
-      gainValue = 25.0F;
-      break;
-    case TSL2591_GAIN_HIGH :
-      gainValue = 425.0F;
-      break;
-    case TSL2591_GAIN_MAX :
-      gainValue = 9876.0F;
-      break;
-    default:
+  switch (_gain) {
+  case TSL2591_GAIN_LOW:
+    gainValue = 1.0F;
+    break;
+  case TSL2591_GAIN_MED:
+    gainValue = 25.0F;
+    break;
+  case TSL2591_GAIN_HIGH:
+    gainValue = 425.0F;
+    break;
+  case TSL2591_GAIN_MAX:
+    gainValue = 9876.0F;
+    break;
+  default:
+    if (verbose) {
       Serial.println("Gain not found!");
-      break;
+    }
+    break;
   }
-
-
 }
 
-void SQM_TSL2591::setCalibrationOffset(float calibrationOffset){
+void SQM_TSL2591::setCalibrationOffset(float calibrationOffset) {
   _calibrationOffset = calibrationOffset;
 }
 
-tsl2591Gain_t SQM_TSL2591::getGain()
-{
-  return _gain;
-}
+tsl2591Gain_t SQM_TSL2591::getGain() { return _gain; }
 
-void SQM_TSL2591::setTiming(tsl2591IntegrationTime_t integration)
-{
-  if (!_initialized)
-  {
-    if (!begin())
-    {
+void SQM_TSL2591::setTiming(tsl2591IntegrationTime_t integration) {
+  if (!_initialized) {
+    if (!begin()) {
       return;
     }
   }
@@ -184,62 +170,54 @@ void SQM_TSL2591::setTiming(tsl2591IntegrationTime_t integration)
   write8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_CONTROL, _integration | _gain);
   disable();
 
-  switch (_integration)
-  {
-    case TSL2591_INTEGRATIONTIME_100MS :
-      integrationValue = 100.F;
-      break;
-    case TSL2591_INTEGRATIONTIME_200MS :
-      integrationValue = 200.F;
-      break;
-    case TSL2591_INTEGRATIONTIME_300MS :
-      integrationValue = 300.F;
-      break;
-    case TSL2591_INTEGRATIONTIME_400MS :
-      integrationValue = 400.F;
-      break;
-    case TSL2591_INTEGRATIONTIME_500MS :
-      integrationValue = 500.F;
-      break;
-    case TSL2591_INTEGRATIONTIME_600MS :
-      integrationValue = 600.F;
-      break;
-    default: // 100ms
-      integrationValue=999.F;
+  switch (_integration) {
+  case TSL2591_INTEGRATIONTIME_100MS:
+    integrationValue = 100.F;
+    break;
+  case TSL2591_INTEGRATIONTIME_200MS:
+    integrationValue = 200.F;
+    break;
+  case TSL2591_INTEGRATIONTIME_300MS:
+    integrationValue = 300.F;
+    break;
+  case TSL2591_INTEGRATIONTIME_400MS:
+    integrationValue = 400.F;
+    break;
+  case TSL2591_INTEGRATIONTIME_500MS:
+    integrationValue = 500.F;
+    break;
+  case TSL2591_INTEGRATIONTIME_600MS:
+    integrationValue = 600.F;
+    break;
+  default: // 100ms
+    integrationValue = 999.F;
+    if (verbose) {
       Serial.println("Integration not found!");
       Serial.println(_integration);
-      break;
+    }
+    break;
   }
-
-
-
 }
 
-tsl2591IntegrationTime_t SQM_TSL2591::getTiming()
-{
-  return _integration;
-}
+tsl2591IntegrationTime_t SQM_TSL2591::getTiming() { return _integration; }
 
-void SQM_TSL2591::configSensor()
-{
+void SQM_TSL2591::configSensor() {
   setGain(config.gain);
   setTiming(config.time);
 }
 
-void SQM_TSL2591::showConfig(){
-  Serial.print("Integration: "); Serial.print(integrationValue); Serial.println(" ms");
-  Serial.print("Gain:        "); Serial.print(gainValue); Serial.println("x");
-
+void SQM_TSL2591::showConfig() {
+  Serial.print("Integration: ");
+  Serial.print(integrationValue);
+  Serial.println(" ms");
+  Serial.print("Gain:        ");
+  Serial.print(gainValue);
+  Serial.println("x");
 }
 
-
-
-uint32_t SQM_TSL2591::getFullLuminosity (void)
-{
-  if (!_initialized)
-  {
-    if (!begin())
-    {
+uint32_t SQM_TSL2591::getFullLuminosity(void) {
+  if (!_initialized) {
+    if (!begin()) {
       return 0;
     }
   }
@@ -248,8 +226,7 @@ uint32_t SQM_TSL2591::getFullLuminosity (void)
   enable();
 
   // Wait x ms for ADC to complete
-  for (uint8_t d=0; d<=_integration; d++)
-  {
+  for (uint8_t d = 0; d <= _integration; d++) {
     delay(120);
   }
 
@@ -263,108 +240,108 @@ uint32_t SQM_TSL2591::getFullLuminosity (void)
   return x;
 }
 
-void SQM_TSL2591::bumpGain(int bumpDirection){
-  switch (config.gain)
-  {
-    case TSL2591_GAIN_LOW :
-      if (bumpDirection>0){
-        config.gain = TSL2591_GAIN_MED;
-      } else {
-        config.gain = TSL2591_GAIN_LOW;
-      }
-      break;
-    case TSL2591_GAIN_MED :
-      if (bumpDirection>0){
-        config.gain = TSL2591_GAIN_HIGH;
-      } else {
-        config.gain = TSL2591_GAIN_LOW;
-      }
-      break;
-    case TSL2591_GAIN_HIGH :
-      if (bumpDirection>0){
-        config.gain = TSL2591_GAIN_MAX;
-      } else {
-        config.gain = TSL2591_GAIN_MED;
-      }
-      break;
-    case TSL2591_GAIN_MAX :
-      if (bumpDirection>0){
-        config.gain = TSL2591_GAIN_MAX;
-      } else {
-        config.gain = TSL2591_GAIN_HIGH;
-      }
-      break;
-    default:
-      break;
+void SQM_TSL2591::bumpGain(int bumpDirection) {
+  switch (config.gain) {
+  case TSL2591_GAIN_LOW:
+    if (bumpDirection > 0) {
+      config.gain = TSL2591_GAIN_MED;
+    } else {
+      config.gain = TSL2591_GAIN_LOW;
+    }
+    break;
+  case TSL2591_GAIN_MED:
+    if (bumpDirection > 0) {
+      config.gain = TSL2591_GAIN_HIGH;
+    } else {
+      config.gain = TSL2591_GAIN_LOW;
+    }
+    break;
+  case TSL2591_GAIN_HIGH:
+    if (bumpDirection > 0) {
+      config.gain = TSL2591_GAIN_MAX;
+    } else {
+      config.gain = TSL2591_GAIN_MED;
+    }
+    break;
+  case TSL2591_GAIN_MAX:
+    if (bumpDirection > 0) {
+      config.gain = TSL2591_GAIN_MAX;
+    } else {
+      config.gain = TSL2591_GAIN_HIGH;
+    }
+    break;
+  default:
+    break;
   }
   setGain(config.gain);
 }
 
-
-void SQM_TSL2591::bumpTime(int bumpDirection){
-  switch (config.time)
-  {
-    case TSL2591_INTEGRATIONTIME_200MS :
-      if (bumpDirection>0){
-        config.time = TSL2591_INTEGRATIONTIME_400MS;
-      } else {
-        config.time = TSL2591_INTEGRATIONTIME_200MS;
-      }
-      break;
-    case TSL2591_INTEGRATIONTIME_400MS :
-      if (bumpDirection>0){
-        config.time = TSL2591_INTEGRATIONTIME_600MS;
-      } else {
-        config.time = TSL2591_INTEGRATIONTIME_200MS;
-      }
-      break;
-    case TSL2591_INTEGRATIONTIME_600MS :
-      if (bumpDirection>0){
-        config.time = TSL2591_INTEGRATIONTIME_600MS;
-      } else {
-        config.time = TSL2591_INTEGRATIONTIME_400MS;
-      }
-      break;
-    default:
-      break;
+void SQM_TSL2591::bumpTime(int bumpDirection) {
+  switch (config.time) {
+  case TSL2591_INTEGRATIONTIME_200MS:
+    if (bumpDirection > 0) {
+      config.time = TSL2591_INTEGRATIONTIME_400MS;
+    } else {
+      config.time = TSL2591_INTEGRATIONTIME_200MS;
+    }
+    break;
+  case TSL2591_INTEGRATIONTIME_400MS:
+    if (bumpDirection > 0) {
+      config.time = TSL2591_INTEGRATIONTIME_600MS;
+    } else {
+      config.time = TSL2591_INTEGRATIONTIME_200MS;
+    }
+    break;
+  case TSL2591_INTEGRATIONTIME_600MS:
+    if (bumpDirection > 0) {
+      config.time = TSL2591_INTEGRATIONTIME_600MS;
+    } else {
+      config.time = TSL2591_INTEGRATIONTIME_400MS;
+    }
+    break;
+  default:
+    break;
   }
   setTiming(config.time);
-
 }
 
-
-void SQM_TSL2591::takeReading (void){
+void SQM_TSL2591::takeReading(void) {
   uint32_t lum;
-  niter=1;
+  niter = 1;
   configSensor();
   lum = getFullLuminosity();
   ir = lum >> 16;
   full = lum & 0xFFFF;
   vis = full - ir;
-  if ((float)full < (float)ir){
-    Serial.println("Odd, full less than ir!  Rechecking...");
+  if ((float)full < (float)ir) {
+    if (verbose) {
+      Serial.println("Odd, full less than ir!  Rechecking...");
+    }
     takeReading();
   }
   // When intensity is faint at current gain setting
-  if ((float)vis < 128.){
-    if (_gain == TSL2591_GAIN_MAX){
-      if (_integration != TSL2591_INTEGRATIONTIME_600MS){
-        Serial.println("Bumping integration up");
+  if ((float)vis < 128.) {
+    if (_gain == TSL2591_GAIN_MAX) {
+      if (_integration != TSL2591_INTEGRATIONTIME_600MS) {
+        if (verbose) {
+          Serial.println("Bumping integration up");
+        }
         bumpTime(1);
-        showConfig();
+        if (verbose)
+          showConfig();
         configSensor();
         lum = getFullLuminosity();
         delay(50);
         takeReading();
       } else {
         uint32_t fullCumulative;
-        uint16_t visCumulative,irCumulative;
+        uint16_t visCumulative, irCumulative;
 
         fullCumulative = full;
         irCumulative = ir;
         visCumulative = vis;
         // Do iterative sampling to gain statistical certainty
-        while ((float)visCumulative < 128.){
+        while ((float)visCumulative < 128.) {
           niter++;
           delay(50);
           lum = getFullLuminosity();
@@ -377,20 +354,24 @@ void SQM_TSL2591::takeReading (void){
             break;
           }
         }
-        if ((float)fullCumulative > (float)irCumulative){
+        if ((float)fullCumulative > (float)irCumulative) {
           full = fullCumulative;
           ir = irCumulative;
           vis = visCumulative;
         } else {
-          Serial.println("Odd, full less than ir!  Rechecking...");
+          if (verbose) {
+            Serial.println("Odd, full less than ir!  Rechecking...");
+          }
           takeReading();
         }
-
       }
     } else {
-      Serial.println("Bumping gain up");
+      if (verbose) {
+        Serial.println("Bumping gain up");
+      }
       bumpGain(1);
-      showConfig();
+      if (verbose)
+        showConfig();
       configSensor();
       lum = getFullLuminosity();
       delay(50);
@@ -398,46 +379,51 @@ void SQM_TSL2591::takeReading (void){
     }
   }
   // If saturated, bump down integration or gain
-  else if (full == 0xFFFF || ir == 0xFFFF){
-    if ((_gain == TSL2591_GAIN_MAX) & (_integration != TSL2591_INTEGRATIONTIME_200MS)){
-      Serial.println("Bumping integration down");
+  else if (full == 0xFFFF || ir == 0xFFFF) {
+    if ((_gain == TSL2591_GAIN_MAX) &
+        (_integration != TSL2591_INTEGRATIONTIME_200MS)) {
+      if (verbose) {
+        Serial.println("Bumping integration down");
+      }
       bumpTime(-1);
-      showConfig();
+      if (verbose)
+        showConfig();
       configSensor();
       lum = getFullLuminosity();
       delay(50);
       takeReading();
     } else {
-      Serial.println("Bumping gain down");
+      if (verbose) {
+        Serial.println("Bumping gain down");
+      }
       bumpGain(-1);
-      showConfig();
+      if (verbose)
+        showConfig();
       configSensor();
       lum = getFullLuminosity();
       delay(50);
       takeReading();
+    }
   }
-}
 
-  float IR = (float)ir / ( gainValue * integrationValue/200.F * niter );
-	float VIS = (float)vis / ( gainValue * integrationValue/200.F * niter );
+  float IR = (float)ir / (gainValue * integrationValue / 200.F * niter);
+  float VIS = (float)vis / (gainValue * integrationValue / 200.F * niter);
   mpsas = 12.6 - 1.086 * log(VIS) + _calibrationOffset;
   dmpsas = 1.086 / sqrt((float)vis);
 }
 
-
-uint8_t SQM_TSL2591::read8(uint8_t reg)
-{
+uint8_t SQM_TSL2591::read8(uint8_t reg) {
   Wire.beginTransmission(TSL2591_ADDR);
   Wire.write(0x80 | 0x20 | reg); // command bit, normal mode
   Wire.endTransmission();
 
   Wire.requestFrom(TSL2591_ADDR, 1);
-  while (! Wire.available());
+  while (!Wire.available())
+    ;
   return Wire.read();
 }
 
-uint16_t SQM_TSL2591::read16(uint8_t reg)
-{
+uint16_t SQM_TSL2591::read16(uint8_t reg) {
   uint16_t x;
   uint16_t t;
 
@@ -462,8 +448,7 @@ uint16_t SQM_TSL2591::read16(uint8_t reg)
   return x;
 }
 
-void SQM_TSL2591::write8 (uint8_t reg, uint8_t value)
-{
+void SQM_TSL2591::write8(uint8_t reg, uint8_t value) {
   Wire.beginTransmission(TSL2591_ADDR);
 #if ARDUINO >= 100
   Wire.write(reg);
@@ -475,17 +460,14 @@ void SQM_TSL2591::write8 (uint8_t reg, uint8_t value)
   Wire.endTransmission();
 }
 
-
-
 float SQM_TSL2591::calculateLux(uint16_t ch0, uint16_t ch1) /*wbp*/
 {
   float atime, again; /*wbp*/
-  float    cpl, lux1, lux2, lux;
-//  uint32_t chan0, chan1; /*wbp*/
+  float cpl, lux1, lux2, lux;
+  //  uint32_t chan0, chan1; /*wbp*/
 
   // Check for overflow conditions first
-  if ((ch0 == 0xFFFF) | (ch1 == 0xFFFF))
-  {
+  if ((ch0 == 0xFFFF) | (ch1 == 0xFFFF)) {
     // Signal an overflow
     return 0.0;
   }
@@ -493,65 +475,64 @@ float SQM_TSL2591::calculateLux(uint16_t ch0, uint16_t ch1) /*wbp*/
   // Note: This algorithm is based on preliminary coefficients
   // provided by AMS and may need to be updated in the future
 
-  switch (_integration)
-  {
-    case TSL2591_INTEGRATIONTIME_100MS :
-      atime = 100.0F;
-      break;
-    case TSL2591_INTEGRATIONTIME_200MS :
-      atime = 200.0F;
-      break;
-    case TSL2591_INTEGRATIONTIME_300MS :
-      atime = 300.0F;
-      break;
-    case TSL2591_INTEGRATIONTIME_400MS :
-      atime = 400.0F;
-      break;
-    case TSL2591_INTEGRATIONTIME_500MS :
-      atime = 500.0F;
-      break;
-    case TSL2591_INTEGRATIONTIME_600MS :
-      atime = 600.0F;
-      break;
-    default: // 200ms
-      atime = 200.0F;
-      break;
+  switch (_integration) {
+  case TSL2591_INTEGRATIONTIME_100MS:
+    atime = 100.0F;
+    break;
+  case TSL2591_INTEGRATIONTIME_200MS:
+    atime = 200.0F;
+    break;
+  case TSL2591_INTEGRATIONTIME_300MS:
+    atime = 300.0F;
+    break;
+  case TSL2591_INTEGRATIONTIME_400MS:
+    atime = 400.0F;
+    break;
+  case TSL2591_INTEGRATIONTIME_500MS:
+    atime = 500.0F;
+    break;
+  case TSL2591_INTEGRATIONTIME_600MS:
+    atime = 600.0F;
+    break;
+  default: // 200ms
+    atime = 200.0F;
+    break;
   }
 
-  switch (_gain)
-  {
-    case TSL2591_GAIN_LOW :
-//      again = 1.0F;
-      again = 1.03F; /*wbp*/
-      break;
-    case TSL2591_GAIN_MED :
-      again = 25.0F;
-      break;
-    case TSL2591_GAIN_HIGH :
-//      again = 428.0F;
-      again = 425.0F; /*wbp*/
-      break;
-    case TSL2591_GAIN_MAX :
-//      again = 9876.0F;
-      again = 7850.0F; /*wbp*/
-      break;
-    default:
-      again = 1.0F;
-      break;
+  switch (_gain) {
+  case TSL2591_GAIN_LOW:
+    //      again = 1.0F;
+    again = 1.03F; /*wbp*/
+    break;
+  case TSL2591_GAIN_MED:
+    again = 25.0F;
+    break;
+  case TSL2591_GAIN_HIGH:
+    //      again = 428.0F;
+    again = 425.0F; /*wbp*/
+    break;
+  case TSL2591_GAIN_MAX:
+    //      again = 9876.0F;
+    again = 7850.0F; /*wbp*/
+    break;
+  default:
+    again = 1.0F;
+    break;
   }
 
   // cpl = (ATIME * AGAIN) / DF
   cpl = (atime * again) / TSL2591_LUX_DF;
 
-  lux1 = ( (float)ch0 - (TSL2591_LUX_COEFB * (float)ch1) ) / cpl;
-  lux2 = ( ( TSL2591_LUX_COEFC * (float)ch0 ) - ( TSL2591_LUX_COEFD * (float)ch1 ) ) / cpl;
+  lux1 = ((float)ch0 - (TSL2591_LUX_COEFB * (float)ch1)) / cpl;
+  lux2 = ((TSL2591_LUX_COEFC * (float)ch0) - (TSL2591_LUX_COEFD * (float)ch1)) /
+         cpl;
 
   // The highest value is the approximate lux equivalent
   lux = lux1 > lux2 ? lux1 : lux2;
 
   // Signal I2C had no errors
-//  return (uint32_t)lux;return (uint32_t)lux;
-  return lux;  /*wbp*/
+  //  return (uint32_t)lux;return (uint32_t)lux;
+  return lux; /*wbp*/
 }
 
 /**************************************************************************/
@@ -559,8 +540,7 @@ float SQM_TSL2591::calculateLux(uint16_t ch0, uint16_t ch1) /*wbp*/
     @brief  Gets the most recent sensor event
 */
 /**************************************************************************/
-bool SQM_TSL2591::getEvent(sensors_event_t *event)
-{
+bool SQM_TSL2591::getEvent(sensors_event_t *event) {
   uint16_t ir, full;
   uint32_t lum = getFullLuminosity();
   /* Early silicon seems to have issues when there is a sudden jump in */
@@ -572,9 +552,9 @@ bool SQM_TSL2591::getEvent(sensors_event_t *event)
   /* Clear the event */
   memset(event, 0, sizeof(sensors_event_t));
 
-  event->version   = sizeof(sensors_event_t);
+  event->version = sizeof(sensors_event_t);
   event->sensor_id = _sensorID;
-  event->type      = SENSOR_TYPE_LIGHT;
+  event->type = SENSOR_TYPE_LIGHT;
   event->timestamp = millis();
 
   /* Calculate the actual lux value */
@@ -588,19 +568,18 @@ bool SQM_TSL2591::getEvent(sensors_event_t *event)
     @brief  Gets the sensor_t data
 */
 /**************************************************************************/
-void SQM_TSL2591::getSensor(sensor_t *sensor)
-{
+void SQM_TSL2591::getSensor(sensor_t *sensor) {
   /* Clear the sensor_t object */
   memset(sensor, 0, sizeof(sensor_t));
 
   /* Insert the sensor name in the fixed length char array */
-  strncpy (sensor->name, "TSL2591", sizeof(sensor->name) - 1);
-  sensor->name[sizeof(sensor->name)- 1] = 0;
-  sensor->version     = 1;
-  sensor->sensor_id   = _sensorID;
-  sensor->type        = SENSOR_TYPE_LIGHT;
-  sensor->min_delay   = 0;
-  sensor->max_value   = 88000.0;
-  sensor->min_value   = 0.001;
-  sensor->resolution  = 0.001;
+  strncpy(sensor->name, "TSL2591", sizeof(sensor->name) - 1);
+  sensor->name[sizeof(sensor->name) - 1] = 0;
+  sensor->version = 1;
+  sensor->sensor_id = _sensorID;
+  sensor->type = SENSOR_TYPE_LIGHT;
+  sensor->min_delay = 0;
+  sensor->max_value = 88000.0;
+  sensor->min_value = 0.001;
+  sensor->resolution = 0.001;
 }

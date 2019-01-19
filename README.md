@@ -8,8 +8,8 @@ This is an application of the TSL 2591 sensor to measuring sky brightness for as
  - Noise estimates given assuming signal counts follow a Poisson process
 
 ## Examples
- - Emulator for [SQM-LE](example/SQM-LE.cpp) network connected device compatible with ESP8266 devices
- - Emulator for [SQM-LU](example/SQM-LU.cpp) usb connected device compatible with most Arduino devices
+ - Emulator for [SQM-LE](example/SQM_LE.cpp) network connected device compatible with ESP8266 devices
+ - Emulator for [SQM-LU](example/SQM_LU.cpp) usb connected device compatible with most Arduino devices
  - Simple [example code](example/SQM_TSL2591_example.cpp) for Arduino devices
 
 

@@ -119,6 +119,19 @@ void SQM_TSL2591::disable(void) {
          TSL2591_ENABLE_POWEROFF);
 }
 
+void SQM_TSL2591::setTemperatureCalibration (const temperatureCalibration &calibrationData) {
+  _temperatureCalibration = calibrationData;
+}
+
+void SQM_TSL2591::setTemperature (float temperature) {
+    _hasTemperature = true;
+    _temperature = temperature;
+}
+
+void SQM_TSL2591::resetTemperature () {
+    _hasTemperature = false;
+}
+
 void SQM_TSL2591::setGain(tsl2591Gain_t gain) {
   if (!_initialized) {
     if (!begin()) {
@@ -305,6 +318,28 @@ void SQM_TSL2591::bumpTime(int bumpDirection) {
   setTiming(config.time);
 }
 
+void SQM_TSL2591::calibrateReadingsForTemperature(uint16_t &ir, uint16_t &full) {
+  if (_hasTemperature) {
+    if (verbose) {
+        Serial.print("Values before temperature calibration: ir=");
+        Serial.print(ir);
+        Serial.print(", full=");
+        Serial.println(full);
+    }
+    float irCalibrationFactor = _temperature * _temperatureCalibration.irSlope + _temperatureCalibration.irIntercept;
+    float fullCalibrationFactor = _temperature * _temperatureCalibration.fullLuminositySlope + _temperatureCalibration.fullLuminosityIntercept;
+    ir   = static_cast<uint16_t>(static_cast<float>(ir) * irCalibrationFactor);
+    full = static_cast<uint16_t>(static_cast<float>(full) * fullCalibrationFactor);
+    if (verbose) {
+        Serial.print("Values after temperature calibration: ir=");
+        Serial.print(ir);
+        Serial.print(", full=");
+        Serial.println(full);
+    }
+
+  }
+}
+
 void SQM_TSL2591::takeReading(void) {
   uint32_t lum;
   niter = 1;
@@ -312,6 +347,7 @@ void SQM_TSL2591::takeReading(void) {
   lum = getFullLuminosity();
   ir = lum >> 16;
   full = lum & 0xFFFF;
+  calibrateReadingsForTemperature(ir, full);
   vis = full - ir;
   if ((float)full < (float)ir) {
     if (verbose) {
@@ -347,6 +383,7 @@ void SQM_TSL2591::takeReading(void) {
           lum = getFullLuminosity();
           ir = lum >> 16;
           full = lum & 0xFFFF;
+          calibrateReadingsForTemperature(ir, full);
           fullCumulative += full;
           irCumulative += ir;
           visCumulative = fullCumulative - irCumulative;

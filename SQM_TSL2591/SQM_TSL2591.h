@@ -128,6 +128,13 @@ typedef struct  {
   tsl2591IntegrationTime_t time;
 } sensorConfig;
 
+typedef struct {
+    float fullLuminositySlope     = 0.000705244123;
+    float fullLuminosityIntercept = 0.9794303797;
+    float irSlope                 = -0.001939421338;
+    float irIntercept             = 1.05;
+} temperatureCalibration;
+
 
 class SQM_TSL2591 : public Adafruit_Sensor
 {
@@ -141,11 +148,14 @@ class SQM_TSL2591 : public Adafruit_Sensor
   uint16_t  read16  ( uint8_t reg );
   uint8_t   read8   ( uint8_t reg );
 
-  float     calculateLux         ( uint16_t ch0, uint16_t ch1 );
-  void      setGain              ( tsl2591Gain_t gain );
-  void      setTiming            ( tsl2591IntegrationTime_t integration );
-  void      setCalibrationOffset ( float calibrationOffset);
-  uint32_t  getFullLuminosity    ( );
+  float     calculateLux              ( uint16_t ch0, uint16_t ch1 );
+  void      setGain                   ( tsl2591Gain_t gain );
+  void      setTiming                 ( tsl2591IntegrationTime_t integration );
+  void      setCalibrationOffset      ( float calibrationOffset);
+  uint32_t  getFullLuminosity         ( );
+  void      setTemperatureCalibration ( const temperatureCalibration &calibrationData);
+  void      setTemperature            ( float temperature);
+  void      resetTemperature          ( );
 
   tsl2591IntegrationTime_t getTiming();
   tsl2591Gain_t            getGain();
@@ -172,6 +182,10 @@ class SQM_TSL2591 : public Adafruit_Sensor
   tsl2591Gain_t _gain;
   int32_t _sensorID;
   float _calibrationOffset;
+  temperatureCalibration _temperatureCalibration;
+  float _temperature;
+  bool _hasTemperature = false;
+  void calibrateReadingsForTemperature(uint16_t &ir, uint16_t &full);
 
   boolean _initialized;
 };
